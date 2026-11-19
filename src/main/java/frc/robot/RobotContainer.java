@@ -10,9 +10,21 @@ import edu.wpi.first.wpilibj2.command.Commands;
 public class RobotContainer {
   public RobotContainer() {
     configureBindings();
+    Shooter shooter = new Shooter();
+    Controller controller = new Controller();
+
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+    Trigger shootTrigger  = new Trigger();
+    shootTrigger.onTrue(startShooter);
+    shootTrigger.onFalse(stopShooter);
+    
+
+
+
+
+  }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
