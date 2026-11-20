@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -14,6 +15,9 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
 
@@ -25,6 +29,7 @@ public class Shooter extends SubsystemBase {
     private Voltage voltage;
     private AngularVelocity velocity;
     private Current current;
+    private AngularVelocity setpoint;
 
     public Shooter() {
         motor = new SparkFlex(ShooterConstants.MOTOR_ID, MotorType.kBrushless);
@@ -42,6 +47,7 @@ public class Shooter extends SubsystemBase {
         voltage = Volts.of(0);
         velocity = RPM.of(0);
         current = Amps.of(0);
+        setpoint = RPM.of(0);
     }
         @Override
         public void periodic() {
@@ -49,7 +55,42 @@ public class Shooter extends SubsystemBase {
         velocity = RPM.of(motor.getEncoder().getVelocity());
         current = Amps.of(motor.getOutputCurrent());
         }
+    
+        @Override
+        public void simulationPeriodic() {
+            velocity = setpoint;
+  }
 
-  
+        private void shoot(AngularVelocity velocity) {
+            motorController.setSetpoint( velocity.in(RPM), ControlType.kVelocity);
+            setpoint = velocity;
+        }
+        
+        public boolean atSpeed() {
+            return velocity.in(RPM) > setpoint.in(RPM) - 20.0;
+        }
 
+        public void setupLiveTuning() {
+            SmartDashboard.putNumber("KP", ShooterConstants.KP);
+            SmartDashboard.putNumber("KV", ShooterConstants.KV);
+        }
+    
+        public void updateLiveTuning() {
+            motorConfig.closedLoop.p(
+                SmartDashboard.getNumber("Shooter/KP", ShooterConstants.KP));
+            motorConfig.closedLoop.feedForward.kV(
+                SmartDashboard.getNumber("Shooter/KV", ShooterConstants.KV));
+        
+            motor.configure(
+                motorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+            
+            motorController = motor.getClosedLoopController();
+
+        }
+        public Command setvelocityCommand(
+                AngularVelocity velocity) {
+            return Commands.runOnce(() -> shoot(velocity), this);
+  }
 }
+
+
