@@ -59,7 +59,7 @@ public class Shooter extends SubsystemBase {
         @Override
         public void simulationPeriodic() {
             velocity = setpoint;
-  }
+        }
 
         private void shoot(AngularVelocity velocity) {
             motorController.setSetpoint( velocity.in(RPM), ControlType.kVelocity);
@@ -90,7 +90,7 @@ public class Shooter extends SubsystemBase {
         public Command setvelocityCommand(
                 AngularVelocity velocity) {
             return Commands.runOnce(() -> shoot(velocity), this);
-  }
+    }
 }
 
 
