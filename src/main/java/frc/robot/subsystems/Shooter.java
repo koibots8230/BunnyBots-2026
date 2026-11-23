@@ -91,6 +91,9 @@ public class Shooter extends SubsystemBase {
                 AngularVelocity velocity) {
             return Commands.runOnce(() -> shoot(velocity), this);
     }
+        public Command setVelocityCommand(AngularVelocity of) {
+            throw new UnsupportedOperationException("Unimplemented method 'setVelocityCommand'");
+        }
 }
 
 
