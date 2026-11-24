@@ -24,13 +24,10 @@ public class RobotContainer {
 
   private void configureBindings() {
     Trigger shootTrigger = new Trigger(() -> controller.getRightTriggerAxis() > 0.15);
-    //Trigger shootTrigger = new Trigger(() -> controller.getAButton());
+    // Trigger shootTrigger = new Trigger(() -> controller.getAButton());
     shootTrigger.onTrue(shooter.setVelocityCommand(RPM.of(ShooterConstants.FLYWHEEL_RPM)));
     shootTrigger.onFalse(shooter.setVelocityCommand(RPM.of(0)));
-}
-
-
-  
+  }  
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
