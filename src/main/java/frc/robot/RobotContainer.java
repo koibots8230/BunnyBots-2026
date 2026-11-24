@@ -24,8 +24,8 @@ public class RobotContainer {
 
   private void configureBindings() {
     Trigger shootTrigger = new Trigger(() -> controller.getRightTriggerAxis() > 0.15);
-    shootTrigger.onTrue(shooter.setvelocityCommand(RPM.of(ShooterConstants.FLYWHEEL_RPM)));
-    shootTrigger.onFalse(shooter.setvelocityCommand(RPM.of(0)));
+    shootTrigger.onTrue(shooter.setVelocityCommand(RPM.of(ShooterConstants.FLYWHEEL_RPM)));
+    shootTrigger.onFalse(shooter.setVelocityCommand(RPM.of(0)));
 }
 
 
