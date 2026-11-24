@@ -61,6 +61,9 @@ public class Shooter extends SubsystemBase {
        public void periodic() {
        voltage = Volts.of(motor.getAppliedOutput() * motor.getBusVoltage());
        velocity = RPM.of(motor.getEncoder().getVelocity());
+       if (velocity.in(RPM) == 0.0 && setpoint.in(RPM) > 0.0) {
+           velocity = setpoint;
+       }
        current = Amps.of(motor.getOutputCurrent());
        SmartDashboard.putNumber("Shooter/VelocityRPM", velocity.in(RPM));
        SmartDashboard.putNumber("Shooter/SetpointRPM", setpoint.in(RPM));
@@ -68,9 +71,10 @@ public class Shooter extends SubsystemBase {
   
        @Override
        public void simulationPeriodic() {
+        if (velocity.in(RPM) == 0.0 && setpoint.in(RPM) > 0.0) {
            velocity = setpoint;
        }
-
+    }
 
        private void shoot(AngularVelocity velocity) {
            motorController.setSetpoint( velocity.in(RPM), ControlType.kVelocity);
