@@ -1,15 +1,20 @@
-package frc.robot;
+package frc.robot.subsystems;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.drive.RobotDriveBase.MotorType;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.RPM;
+import static edu.wpi.first.units.Units.Volts;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.Spark;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.config.SparkConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.units.measure.Voltage;
@@ -19,11 +24,11 @@ import edu.wpi.first.units.measure.Current;
 
 
 @logged
-public class duganSubsystem extends SubsystemBase{
+public class duganSubsystem<fixedMotorConfig> extends SubsystemBase{
 
 
     @NotLogged private final Spark fixedMotor;
-    @NotLogged private final SparkConfig fixedMotorConfig;
+    @NotLogged private final SparkFlexConfig fixedMotorConfig;
     @NotLogged private SparkClosedLoopController fixedMotorController;
 
 
@@ -34,12 +39,12 @@ public class duganSubsystem extends SubsystemBase{
 
 
     public duganSubsystem() {
-        fixedMotor = new Spark(DuganConstants.duganConstants.MOTOR_ID, MotorType.kBrushless);
+        fixedMotor = new Spark(Constants.duganConstants.MOTOR_ID, MotorType.kBrushless);
         fixedMotorConfig = new SparkFlexConfig();
-        fixedMotorConfig.closedLoop.feedForward.kV(DuganConstants.FIXEDMOTOR_FEEDFORWARD.kv);
-        fixedMotorConfig.closedLoop.p(DuganConstants.FIXEDMOTOR_PID.kp);
+        fixedMotorConfig.closedLoop.feedForward.kV(Constants.FIXEDMOTOR_FEEDFORWARD.kv);
+        fixedMotorConfig.closedLoop.p(Constants.FIXEDMOTOR_PID.kp);
         fixedMotorConfig.idleMode(IdleMode.kCoast);
-        fixedMotorConfig.smartCurrentLimit((int) DuganConstants.FIXEDMOTOR_CURRENT_LIMIT.in(Amps));
+        fixedMotorConfig.smartCurrentLimit((int) Constants.FIXEDMOTOR_CURRENT_LIMIT.in(Amps));
         fixedMotorConfig.inverted(true); 
         fixedMotor.configure(fixedMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -76,6 +81,6 @@ public class duganSubsystem extends SubsystemBase{
     }
 
     public Command setVelocityCommand(AngularVelocity fixedMotorVelocity) {
-        return Commands.runOnce(() -> shoot(fixedMotorVelocity), this);
+        return Command.runOnce(() -> shoot(fixedMotorVelocity), this);
     }
 }
