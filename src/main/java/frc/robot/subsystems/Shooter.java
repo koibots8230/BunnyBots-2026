@@ -62,7 +62,9 @@ public class Shooter extends SubsystemBase {
        voltage = Volts.of(motor.getAppliedOutput() * motor.getBusVoltage());
        velocity = RPM.of(motor.getEncoder().getVelocity());
        current = Amps.of(motor.getOutputCurrent());
-       }
+       SmartDashboard.putNumber("Shooter/VelocityRPM", velocity.in(RPM));
+       SmartDashboard.putNumber("Shooter/SetpointRPM", setpoint.in(RPM));
+}
   
        @Override
        public void simulationPeriodic() {
