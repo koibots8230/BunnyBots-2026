@@ -1,100 +1,92 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.wpilibj.drive.RobotDriveBase.MotorType;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import frc.robot.Constants;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel;
+import com.revrobotics.spark.SparkBase.ControlType;
+//import com.revrobotics.spark.SparkBase.ResetMode; This caused an error, solution was to put import com.revrobotics.ResetMode(6 lines above)
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import frc.robot.Constants.Constants.java;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.epilogue.NotLogged;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Voltage;
-
-@logged
-public class shooter extends SubsystemBase {
 
 
 
-  @NotLogged private final SparkFlex flywheelMotor;
-  @NotLogged private final SparkFlexConfig flywheelMotorConfig;
+@Logged
+public class Shooter extends SubsystemBase{
 
 
-
-  private Voltage flywheelVoltage;
-  private AngularVelocity flywheelVelocity;
-  private Current flywheelCurrent;
-  private AngularVelocity flywheelSetpoint;
-
-  private Voltage feederVoltage;
-  private AngularVelocity feederVelocity;
-  private Current feederCurrent;
-  private AngularVelocity feederSetpoint;   
+    private final SparkFlex fixedMotor;
+    private final SparkFlexConfig fixedMotorConfig;
+    private SparkClosedLoopController fixedMotorController;
 
 
-  public Shooter() {
-    flywheelMotor = new SparkFlex(ShooterConstants.FLYWHEEL_MOTOR_ID, MotorType.kBrushless); // creating motor 
-    flywheelMotorConfig = new SparkFlexConfig(); // creating motor
-    flywheelMotorConfig.closedLoop.p(ShooterConstants.FLYWHEEL_PID.kp);
-    flywheelMotorConfig.closedLoop.feedForward.kV(ShooterConstants.FLYWHEEL_FEEDFORWARD.kv);
-    flywheelMotorConfig.idleMode(IdleMode.kCoast);
-
-    flywheelMotorConfig.smartCurrentLimit((int) ShooterConstants.FLYWHEEL_CURRENT_LIMIT.in(Amps));
-    flywheelMotorConfig.inverted(true);
-    flywheelMotor.configure(flywheelMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    flywheelMotorController = flywheelMotor.getClosedLoopController();
-
-    flywheelVoltage = Volts.of(0); // configuring voltage, velocity,current, and setpoint
-    flywheelVelocity = RPM.of(0);
-    flywheelCurrent = Amps.of(0);
-    flywheelSetpoint = RPM.of(0);
+    private Voltage  fixedMotorVoltage;
+    private AngularVelocity fixedMotorVelocity;
+    private Current fixedMotorCurrent;
+    private AngularVelocity fixedMotorSetpoint;
 
 
+    public Shooter() {
+        fixedMotor = new SparkFlex(Constants.shooterConstants.MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
+        fixedMotorConfig = new SparkFlexConfig();
+        fixedMotorConfig.closedLoop.feedForward.kV(Constants.shooterConstants.FIXEDMOTOR_FEEDFORWARD.kv);// Example of value, adjust as needed
+        fixedMotorConfig.closedLoop.p(Constants.shooterConstants.FIXEDMOTOR_PID.kp);
+        fixedMotorConfig.idleMode(IdleMode.kCoast);
+        fixedMotorConfig.smartCurrentLimit((int) Constants.shooterConstants.FIXEDMOTOR_CURRENT_LIMIT.in(Amps));
+        fixedMotorConfig.inverted(true); 
+        fixedMotor.configure(fixedMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    @overide
-    public void periodic() {
-    flywheelVoltage = Volts.of(flywheelMotor.getAppliedOutput() * flywheelMotor.getBusVoltage());
-    flywheelVelocity = RPM.of(flywheelMotor.getEncoder().getVelocity());
-    flywheelCurrent = Amps.of(flywheelMotor.getOutputCurrent());
+        fixedMotorController = fixedMotor.getClosedLoopController();
 
-    feederVoltage = Volts.of(feederMotor.getAppliedOutput() * feederMotor.getBusVoltage());
-    feederVelocity = RPM.of(feederMotor.getEncoder().getVelocity());
-    feederCurrent = Amps.of(feederMotor.getOutputCurrent());
+
+        fixedMotorVoltage = Volts.of(0); // Example voltage, adjust as needed
+        fixedMotorVelocity = RPM.of(0); // Example velocity, adjust as needed
+        fixedMotorCurrent = Amps.of(0); // Example current, adjust as needed
+        fixedMotorSetpoint = RPM.of(0); // Example setpoint, adjust as needed
+    
+    }
 
     @Override
+    public void periodic() {
+        fixedMotorVoltage = Volts.of(fixedMotor.getAppliedOutput() * fixedMotor.getBusVoltage());
+        fixedMotorVelocity = RPM.of(fixedMotor.getEncoder().getVelocity());
+        fixedMotorCurrent = Amps.of(fixedMotor.getOutputCurrent());
+        //fixedMotorSetpoint = RPM.of(fixedMotor.getSetpoint());    //on refrence sheet, there is no getSetpoint line
+    }
+
     public void simulationPeriodic() {
-    flywheelVelocity = flywheelSetpoint;
-    }
-    private void shoot(AngularVelocity flywheelVelocity, AngularVelocity feederVelocity) {
-    motorVelocity = flywheelSetpoin; //setting the velocity 
+        // This method will be called once per scheduler run during simulation
+        fixedMotorVelocity = fixedMotorSetpoint;
     }
 
-    public boolean atSpeed() { //command do the spin(speed)
-    return flywheelVelocity.in(RPM) > flywheelSetpoint.in(RPM) - 20.0; //run do the speed(speed)
+    private void shoot(AngularVelocity fixedMotorVelocity) {
+        fixedMotorController.setSetpoint(fixedMotorVelocity.in(RPM), ControlType.kVelocity);
+        fixedMotorSetpoint = fixedMotorVelocity;
+    }
 
+    public boolean atSpeed(){
+        return fixedMotorVelocity.in(RPM) > fixedMotorSetpoint.in(RPM) - 20;
+    }
 
-
-       
-    public void updateLiveTuning() {
-    flywheelMotorConfig.closedLoop.p(
-        SmartDashboard.getNumber("Shooter/flywheelkp", ShooterConstants.FLYWHEEL_PID.kp));
-    flywheelMotorConfig.closedLoop.feedForward.kV(
-        SmartDashboard.getNumber("Shooter/flywheelffkv", ShooterConstants.FLYWHEEL_FEEDFORWARD.kv));
-    feederMotorConfig.closedLoop.p(
-        SmartDashboard.getNumber("Shooter/intakekp", ShooterConstants.FEEDER_PID.kp));
-    feederMotorConfig.closedLoop.feedForward.kV(
-        SmartDashboard.getNumber("Shooter/intakeffkv", ShooterConstants.FEEDER_FEEDFORWARD.kv));
-
-    flywheelMotor.configure(
-        flywheelMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    feederMotor.configure(
-        feederMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    flywheelMotorController = flywheelMotor.getClosedLoopController();
-    feederMotorController = feederMotor.getClosedLoopController();
-  }
-  } 
-}
-}
+    public Command setVelocityCommand(AngularVelocity fixedMotorVelocity) {
+        return Commands.runOnce(() -> shoot(fixedMotorVelocity), this);
+    }
 }

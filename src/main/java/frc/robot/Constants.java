@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RPM;
@@ -23,7 +23,7 @@ import frc.lib.util.FeedforwardGains;
 
 
 public class Constants extends SubsystemBase{
-    public static class duganConstants { 
+    public static class shooterConstants { 
         public static final AngularAcceleration MOTOR_VELOCITY = RadiansPerSecondPerSecond.of(1.0 * Math.PI);//1.0 * Math.PI is a placeholder value, adjust as needed
         public static final AngularVelocity SHOOTER_RPM = RPM.of(1000);
         public static final int MOTOR_ID = 20;

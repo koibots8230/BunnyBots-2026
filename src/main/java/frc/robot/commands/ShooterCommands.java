@@ -1,13 +1,18 @@
+package frc.robot.commands;
+
+
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.RPM;
-import frc.robot.subsystems.shooter;
+import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Constants;
+import static edu.wpi.first.units.Units.RPM;
+import frc.robot.subsystems.Shooter;
 
 public class ShooterCommands{
-    public Command startShooter(){
-        shooter.setVelocityCommand(RPM.of(shooterRPM));
+    public static Command startShooter(Shooter shooter){
+        return shooter.setVelocityCommand(Constants.shooterConstants.SHOOTER_RPM);
     }
-    public Command stopShooter(){
-        shooter.setVelocityCommand(RPM.of(0));
+    public static Command stopShooter(Shooter shooter){
+        return shooter.setVelocityCommand(RPM.of(0));
 
     }
 }
