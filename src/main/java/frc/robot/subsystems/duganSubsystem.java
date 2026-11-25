@@ -3,18 +3,24 @@ package frc.robot.subsystems;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.drive.RobotDriveBase.MotorType;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
-
+import frc.robot.subsystems.Constants;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.ResetMode;
+//import com.revrobotics.spark.SparkBase.ResetMode; This caused an error, solution was to put import com.revrobotics.ResetMode(6 lines above)
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkFlexConfig;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.epilogue.NotLogged;
 import edu.wpi.first.units.measure.Voltage;
@@ -27,7 +33,7 @@ import edu.wpi.first.units.measure.Current;
 public class duganSubsystem<fixedMotorConfig> extends SubsystemBase{
 
 
-    @NotLogged private final Spark fixedMotor;
+    @NotLogged private final SparkFlex fixedMotor;
     @NotLogged private final SparkFlexConfig fixedMotorConfig;
     @NotLogged private SparkClosedLoopController fixedMotorController;
 
@@ -39,12 +45,12 @@ public class duganSubsystem<fixedMotorConfig> extends SubsystemBase{
 
 
     public duganSubsystem() {
-        fixedMotor = new Spark(Constants.duganConstants.MOTOR_ID, MotorType.kBrushless);
+        fixedMotor = new SparkFlex(Constants.duganConstants.MOTOR_ID, SparkLowLevel.MotorType.kBrushless);
         fixedMotorConfig = new SparkFlexConfig();
-        fixedMotorConfig.closedLoop.feedForward.kV(Constants.FIXEDMOTOR_FEEDFORWARD.kv);
-        fixedMotorConfig.closedLoop.p(Constants.FIXEDMOTOR_PID.kp);
+        fixedMotorConfig.closedLoop.feedForward.kV(Constants.duganConstants.FIXEDMOTOR_FEEDFORWARD.kv);// Example of value, adjust as needed
+        fixedMotorConfig.closedLoop.p(Constants.duganConstants.FIXEDMOTOR_PID.kp);
         fixedMotorConfig.idleMode(IdleMode.kCoast);
-        fixedMotorConfig.smartCurrentLimit((int) Constants.FIXEDMOTOR_CURRENT_LIMIT.in(Amps));
+        fixedMotorConfig.smartCurrentLimit((int) Constants.duganConstants.FIXEDMOTOR_CURRENT_LIMIT.in(Amps));
         fixedMotorConfig.inverted(true); 
         fixedMotor.configure(fixedMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -63,7 +69,7 @@ public class duganSubsystem<fixedMotorConfig> extends SubsystemBase{
         fixedMotorVoltage = Volts.of(fixedMotor.getAppliedOutput() * fixedMotor.getBusVoltage());
         fixedMotorVelocity = RPM.of(fixedMotor.getEncoder().getVelocity());
         fixedMotorCurrent = Amps.of(fixedMotor.getOutputCurrent());
-        fixedMotorSetpoint = RPM.of(fixedMotor.getSetpoint());
+        //fixedMotorSetpoint = RPM.of(fixedMotor.getSetpoint());    //on refrence sheet, there is no getSetpoint line
     }
 
     public void simulationPeriodic() {
@@ -72,7 +78,7 @@ public class duganSubsystem<fixedMotorConfig> extends SubsystemBase{
     }
 
     private void shoot(AngularVelocity fixedMotorVelocity) {
-        fixedMotorController.setpoint(fixedMotorVelocity.in(RPM), ControlType.kVelocity);
+        fixedMotorController.setSetpoint(fixedMotorVelocity.in(RPM), ControlType.kVelocity);
         fixedMotorSetpoint = fixedMotorVelocity;
     }
 
@@ -81,6 +87,8 @@ public class duganSubsystem<fixedMotorConfig> extends SubsystemBase{
     }
 
     public Command setVelocityCommand(AngularVelocity fixedMotorVelocity) {
-        return Command.runOnce(() -> shoot(fixedMotorVelocity), this);
+        return Commands.runOnce(() -> shoot(fixedMotorVelocity), this);
     }
+    //public Command setVelocityCommand(AngularVelocity flywheelVelocity, AngularVelocity feederVelocity) {
+      //  return Commands.runOnce(() -> shoot(flywheelVelocity, feederVelocity), this);
 }

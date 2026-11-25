@@ -1,86 +1,87 @@
 package frc.lib.util;
 
-public class FeedforwardGains {
+public class PIDGains {
   // These are public properties which allow them to be accessed directly without need for get/set
   // methods.
   // final means that they are immutable after object creation, attempting to change them will cause
   // a compile error.
-  public final double ks;
-  public final double kv;
-  public final double ka;
-  public final double kg;
+  public final double kp;
+  public final double ki;
+  public final double kd;
+  public final double kf;
 
   /**
-   * FeedforwardGains constructor is protected so that it can only be constructed through the use of
-   * the Builder
+   * PIDGains constructor is protected so that it can only be constructed through the use of the
+   * Builder Details of PID control can be found in the WPI documentation
+   * https://docs.wpilib.org/en/stable/docs/software/advanced-controls/introduction/introduction-to-pid.html#introduction-to-pid
    *
    * @param builder
    */
-  protected FeedforwardGains(Builder builder) {
-    this.ks = builder.ks;
-    this.kv = builder.kv;
-    this.ka = builder.ka;
-    this.kg = builder.kg;
+  protected PIDGains(Builder builder) {
+    this.kp = builder.kp;
+    this.ki = builder.ki;
+    this.kd = builder.kd;
+    this.kf = builder.kf;
   }
 
   /**
-   * This class uses a Builder pattern to construct a FeedforwardGains Each of the four feedforward
-   * gains have separate methods in the Builder. This is a more explicit way of creating a data
-   * object with immutable data than using constructors. The FeedforwardGains can be built by
-   * applying 0 or more of the gains values.
+   * This class uses a Builder pattern to construct a PIDGains Each of the three PID gains and
+   * feedforward have separate methods in the Builder. This is a more explicit way of creating a
+   * data object with immutable data than using constructors. The PIDGains can be built by applying
+   * 0 or more of the gains values.
    */
   public static class Builder {
     // Gains default to 0.0, so only gains with a positive value need to be built
-    public double ks = 0.0;
-    public double kv = 0.0;
-    public double ka = 0.0;
-    public double kg = 0.0;
+    public double kp = 0.0;
+    public double ki = 0.0;
+    public double kd = 0.0;
+    public double kf = 0.0;
 
     /**
-     * The gain needed to overcome static friction.
+     * The proportional gain. This is
      *
-     * @param ks The static gain. Must be greater than or equal to 0.0.
+     * @param kp The proportional gain. Must be greater than or equal to 0.0.
      * @return this FeedforwardGains Builder
      */
-    public Builder ks(double ks) {
-      if (ks < 0.0) throw new IllegalArgumentException();
-      this.ks = ks;
+    public Builder kp(double kp) {
+      if (kp < 0.0) throw new IllegalArgumentException();
+      this.kp = kp;
       return this;
     }
 
     /**
-     * The gain needed to achieve the desired velocity.
+     * The integral gain.
      *
-     * @param kv The velocity gain. Must be greater than or equal to 0.0.
+     * @param ki The integral gain. Must be greater than or equal to 0.0.
      * @return this FeedforwardGains Builder
      */
-    public Builder kv(double kv) {
-      if (kv < 0.0) throw new IllegalArgumentException();
-      this.kv = kv;
+    public Builder ki(double ki) {
+      if (ki < 0.0) throw new IllegalArgumentException();
+      this.ki = ki;
       return this;
     }
 
     /**
-     * The gain need to achieve the desired acceleration
+     * The derivative gain.
      *
-     * @param ka The acceleration gain. Must be greater than or equal to 0.0.
+     * @param kd The derivative gain. Must be greater than or equal to 0.0.
      * @return this FeedforwardGains Builder
      */
-    public Builder ka(double ka) {
-      if (ka < 0.0) throw new IllegalArgumentException();
-      this.ka = ka;
+    public Builder kd(double kd) {
+      if (kd < 0.0) throw new IllegalArgumentException();
+      this.kd = kd;
       return this;
     }
 
     /**
-     * The gain needed to overcome gravity.
+     * The feedforward gain.
      *
-     * @param kg The gravity gain. Must be greater than or equal to 0.0.
+     * @param kf The feedforward gain. Must be greater than or equal to 0.0.
      * @return this FeedforwardGains Builder
      */
-    public Builder kg(double kg) {
-      if (kg < 0.0) throw new IllegalArgumentException();
-      this.kg = kg;
+    public Builder kf(double kf) {
+      if (kf < 0.0) throw new IllegalArgumentException();
+      this.kf = kf;
       return this;
     }
 
@@ -89,8 +90,8 @@ public class FeedforwardGains {
      *
      * @return a new FeedforwardGains
      */
-    public FeedforwardGains build() {
-      return new FeedforwardGains(this);
+    public PIDGains build() {
+      return new PIDGains(this);
     }
   }
 }

@@ -12,7 +12,7 @@ import edu.wpi.first.units.measure.Current;
 
 
 
-@logged
+
 public class SpinnyDugan extends SubsystemBase{
     //DuganConstants FirstLinearVelocity;
     //DuganConstants SecondLinearVelocity;
