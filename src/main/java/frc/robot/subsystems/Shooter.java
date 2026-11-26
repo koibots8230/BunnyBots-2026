@@ -4,9 +4,22 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.drive.RobotDriveBase.MotorType;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import frc.robot.Constants;
+import frc.robot.Robot;
+
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Volts;
+
+import org.opencv.dnn.Net;
+
+//imports for simulators
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
@@ -53,6 +66,7 @@ public class Shooter extends SubsystemBase{
         fixedMotorConfig.smartCurrentLimit((int) Constants.shooterConstants.FIXEDMOTOR_CURRENT_LIMIT.in(Amps));
         fixedMotorConfig.inverted(true); 
         fixedMotor.configure(fixedMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        shooterEnabled.setBoolean(false);
 
         fixedMotorController = fixedMotor.getClosedLoopController();
 
@@ -70,7 +84,27 @@ public class Shooter extends SubsystemBase{
         fixedMotorVelocity = RPM.of(fixedMotor.getEncoder().getVelocity());
         fixedMotorCurrent = Amps.of(fixedMotor.getOutputCurrent());
         //fixedMotorSetpoint = RPM.of(fixedMotor.getSetpoint());    //on refrence sheet, there is no getSetpoint line
-    }
+        //This code was for advantagescope
+        /*if (RobotBase.isSimulation()){
+            if (shooterToggle.getBoolean(false)) {
+                fixedMotor.set(0.20);
+            } else {
+                fixedMotor.stopMotor();
+            }
+
+            }/*
+             */
+            //This code is for elastic
+
+            boolean enabled = shooterEnabled.getBoolean(false);
+            if (RobotBase.isSimulation()) {
+                fixedMotor.set(0.20);
+            } else {
+                fixedMotor.stopMotor();
+            }
+            shooterTable.getEntry("MotorOutput").setDouble(enabled ? 0.20 : 0.0 );
+        }
+    
 
     public void simulationPeriodic() {
         // This method will be called once per scheduler run during simulation
@@ -89,4 +123,15 @@ public class Shooter extends SubsystemBase{
     public Command setVelocityCommand(AngularVelocity fixedMotorVelocity) {
         return Commands.runOnce(() -> shoot(fixedMotorVelocity), this);
     }
+    //Down below for simulators
+
+    /*private final GenericEntry shooterToggle = Shuffleboard.getTab("Shooter")
+        .add("Shooter ON/OFF", false)
+        .withWidget("Toggle Button")
+        .getEntry();
+*/
+    private final NetworkTable shooterTable = NetworkTableInstance.getDefault().getTable("Shooter");
+
+    private final NetworkTableEntry shooterEnabled = shooterTable.getEntry("Enabled");
+    
 }
