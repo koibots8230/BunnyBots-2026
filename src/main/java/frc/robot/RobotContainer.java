@@ -33,7 +33,7 @@ public class RobotContainer {
     shootTrigger.onTrue(shooter.setVelocityCommand(RPM.of(ShooterConstants.FLYWHEEL_RPM)));
     shootTrigger.onFalse(shooter.setVelocityCommand(RPM.of(0)));
 
-    Trigger alignToDepot = new Trigger(() -> controller.getRightBumperButton());
+    Trigger alignToDepot = new Trigger(() -> controller.getAButton());
     alignToDepot.whileTrue(VisionCommands.alignToDepot(camera));
 
   }  
