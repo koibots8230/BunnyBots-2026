@@ -17,7 +17,24 @@ public class VisionCommands {
 
         });
     }
+
     private static PhotonTrackedTarget getDepotTarget(PhotonCamera camera) {
-        //helper method
+        var results = camera.getAllUnreadResults();
+        if (results.isEmpty()) return null;
+
+        PhotonPipelineResult latestResult = results.get(results.size() - 1);
+        if (!latestResult.hasTargets()) return null;
+
+        for (PhotonTrackedTarget target : latestResult.getTargets()) {
+            boolean isDepotTag = 
+                (VisionConstants.DEPOT_TAG_ID == -1) || 
+                (target.getFiducialId() == VisionConstants.DEPOT_TAG_ID);
+            
+            if (isDepotTag) {
+                return target;
+            }
+        }
+
+        return null;
     }
 }
