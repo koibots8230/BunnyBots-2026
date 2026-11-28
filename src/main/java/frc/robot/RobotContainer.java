@@ -10,15 +10,20 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.Shooter;
+import frc.robot.commands.*;
 import static edu.wpi.first.units.Units.RPM;
+
+import org.photonvision.PhotonCamera;
 
 public class RobotContainer {
   private final XboxController controller;
   private final Shooter shooter;  
+  private final PhotonCamera camera;
   
   public RobotContainer() {
     shooter = new Shooter();
     controller = new XboxController(0);
+    camera = new PhotonCamera("photonvision");
     configureBindings();
   }
 
@@ -27,6 +32,10 @@ public class RobotContainer {
     // Trigger shootTrigger = new Trigger(() -> controller.getAButton());
     shootTrigger.onTrue(shooter.setVelocityCommand(RPM.of(ShooterConstants.FLYWHEEL_RPM)));
     shootTrigger.onFalse(shooter.setVelocityCommand(RPM.of(0)));
+
+    Trigger alignToDepot = new Trigger(() -> controller.getRightBumperButton());
+    alignToDepot.whileTrue(VisionCommands.alignToDepot(camera));
+
   }  
 
   public Command getAutonomousCommand() {
