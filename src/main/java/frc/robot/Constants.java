@@ -18,8 +18,8 @@ public final class Constants {
   }
   public static final class VisionConstants {
     public static final PIDGains TURN_PID = new PIDGains.Builder().kp(0.05).build();
-
-    //idk rn so just put -1
-    public static final int DEPOT_TAG_ID = -1;
+    public static final double MAX_TURN_SPEED = 3.0;
+    
+    public static final int DEPOT_TAG_ID = -1; //idk rn so just put -1
   }
 }
