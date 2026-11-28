@@ -10,17 +10,14 @@ import org.photonvision.targeting.PhotonPipelineResult;
 
 public class VisionCommands {
     public static Command alignToDepot(PhotonCamera camera) {
-        PIDController turnPID = new PIDController(VisionConstants.TURN_PID, 0, 0);
+        PIDController turnPID = new PIDController(VisionConstants.TURN_PID.kp, 0, 0);
         turnPID.setSetpoint(0);
 
         return Commands.run(() -> {
-            PhotonTrackedTargt depotTarget = getDepotTarget(camera);
-            boolean depotVisible = (depotTarget != null);
 
-            double turnToDepot = 0.0;
-            if (depotVisible) {
-                turnToDepot = turnPID.
-            }
-        })
+        });
+    }
+    private static PhotonTrackedTarget getDepotTarget(PhotonCamera camera) {
+        //helper method
     }
 }
