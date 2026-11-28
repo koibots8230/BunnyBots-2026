@@ -17,6 +17,6 @@ public final class Constants {
     public static final int MOTOR_ID = 20;
   }
   public static final class VisionConstants {
-    
+    public static final PIDGains TURN_PID = new PIDGains.Builder().kp(0.05).build();
   }
 }
