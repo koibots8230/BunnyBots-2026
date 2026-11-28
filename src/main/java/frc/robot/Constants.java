@@ -16,4 +16,7 @@ public final class Constants {
 
     public static final int MOTOR_ID = 20;
   }
+  public static final class VisionConstants {
+    
+  }
 }
