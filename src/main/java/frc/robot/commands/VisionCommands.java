@@ -32,7 +32,7 @@ public class VisionCommands {
 
             SmartDashboard.putBoolean("Vision/Depot Visible", depotVisible);
             SmartDashboard.putNumber("Vision/Turn to Depot", turnToDepot);
-        });
+        }).finallyDo(() -> turnPID.close());
     }
 
     private static PhotonTrackedTarget getDepotTarget(PhotonCamera camera) {
